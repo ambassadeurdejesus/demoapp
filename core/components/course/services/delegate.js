@@ -74,8 +74,7 @@ angular.module('mm.core.course')
 
     self.$get = function($q, $log, $mmSite, $mmUtil, $mmCourseContentHandler) {
         var enabledHandlers = {},
-            self = {},
-            lastUpdateHandlersStart = {};
+            self = {};
 
         $log = $log.getInstance('$mmCourseDelegate');
 
@@ -103,23 +102,6 @@ angular.module('mm.core.course')
         };
 
         /**
-         * Check if a time belongs to the last update handlers call.
-         * This is to handle the cases where updateContentHandlers don't finish in the same order as they're called.
-         *
-         * @module mm.core.course
-         * @ngdoc method
-         * @name $mmCourseDelegate#isLastUpdateCall
-         * @param  {Number}  time Time to check.
-         * @return {Boolean}      True if equal, false otherwise.
-         */
-        self.isLastUpdateCall = function(time) {
-            if (!lastUpdateHandlersStart) {
-                return true;
-            }
-            return time == lastUpdateHandlersStart;
-        };
-
-        /**
          * Update the enabled handlers for the current site.
          *
          * @module mm.core.course
@@ -127,13 +109,11 @@ angular.module('mm.core.course')
          * @name $mmCourseDelegate#updateContentHandler
          * @param {String} handles The module this handler handles, e.g. forum, label. This value will be compared with
          * @param {Object} handlerInfo The handler details.
-         * @param  {Number} time Time this update process started.
          * @return {Promise} Resolved when enabled, rejected when not.
          * @protected
          */
-        self.updateContentHandler = function(handles, handlerInfo, time) {
-            var promise,
-                siteId = $mmSite.getId();
+        self.updateContentHandler = function(handles, handlerInfo) {
+            var promise;
 
             if (typeof handlerInfo.instance === 'undefined') {
                 handlerInfo.instance = $mmUtil.resolveObject(handlerInfo.handler, true);
@@ -146,17 +126,14 @@ angular.module('mm.core.course')
             }
 
             // Checks if the content is enabled.
-            return promise.catch(function() {
-                return false;
-            }).then(function(enabled) {
-                // Verify that this call is the last one that was started.
-                if (self.isLastUpdateCall(time) && $mmSite.isLoggedIn() && $mmSite.getId() === siteId) {
-                    if (enabled) {
-                        enabledHandlers[handles] = handlerInfo.instance;
-                    } else {
-                        delete enabledHandlers[handles];
-                    }
+            return promise.then(function(enabled) {
+                if (enabled) {
+                    enabledHandlers[handles] = handlerInfo.instance;
+                } else {
+                    return $q.reject();
                 }
+            }).catch(function() {
+                delete enabledHandlers[handles];
             });
         };
 
@@ -171,15 +148,13 @@ angular.module('mm.core.course')
          */
         self.updateContentHandlers = function() {
             var promises = [],
-                now = new Date().getTime();
+                enabledHandlers = {};
 
             $log.debug('Updating content handlers for current site.');
 
-            lastUpdateHandlersStart = now;
-
             // Loop over all the content handlers.
             angular.forEach(contentHandlers, function(handlerInfo, handles) {
-                promises.push(self.updateContentHandler(handles, handlerInfo, now));
+                promises.push(self.updateContentHandler(handles, handlerInfo));
             });
 
             return $q.all(promises).then(function() {
