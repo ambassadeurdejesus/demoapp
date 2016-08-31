@@ -21,10 +21,9 @@ angular.module('mm.core')
  * @description
  * This service allows to add new languages strings.
  */
-.factory('$mmLang', function($translate, $translatePartialLoader, $mmConfig, $cordovaGlobalization, $q, mmCoreConfigConstants) {
+.factory('$mmLang', function($translate, $translatePartialLoader, $mmConfig, $cordovaGlobalization, $q) {
 
     var self = {},
-        fallbackLanguage = 'en',
         currentLanguage; // Save current language in a variable to speed up the get function.
 
     /**
@@ -34,19 +33,11 @@ angular.module('mm.core')
      * @ngdoc method
      * @name $mmLang#registerLanguageFolder
      * @param  {String} path Path of the folder to use.
-     * @return {Promise}     Promise resolved when all the language files to be used are loaded.
+     * @return {Promise}     Promise resolved when file is loaded.
      */
     self.registerLanguageFolder = function(path) {
         $translatePartialLoader.addPart(path);
-        // We refresh the languages one by one because if we refresh all of them at once and 1 file isn't found
-        // then no language will be loaded. This way if 1 language file is missing only that language won't be refreshed.
-        var promises = [];
-        promises.push($translate.refresh(currentLanguage));
-        if (currentLanguage !== fallbackLanguage) {
-            // Refresh fallback language.
-            promises.push($translate.refresh(fallbackLanguage));
-        }
-        return $q.all(promises);
+        return $translate.refresh();
     };
 
     /**
@@ -55,12 +46,21 @@ angular.module('mm.core')
      * @module mm.core
      * @ngdoc method
      * @name $mmLang#getCurrentLanguage
-     * @return {Promise} Promise resolved with the current language.
+     * @return {[type]} [description]
      */
     self.getCurrentLanguage = function() {
 
         if (typeof currentLanguage != 'undefined') {
             return $q.when(currentLanguage);
+        }
+
+        // Get default language from config.
+        function getDefaultLanguage() {
+            return $mmConfig.get('default_lang').then(function(language) {
+                return language;
+            }, function() {
+                return 'en';
+            });
         }
 
         // Get current language from config (user might have changed it).
@@ -73,20 +73,26 @@ angular.module('mm.core')
                     var language = result.value.toLowerCase();
                     if (language.indexOf('-') > -1) {
                         // Language code defined by locale has a dash, like en-US or es-ES. Check if it's supported.
-                        if (mmCoreConfigConstants.languages && typeof mmCoreConfigConstants.languages[language] == 'undefined') {
-                            // Code is NOT supported. Fallback to language without dash. E.g. 'en-US' would fallback to 'en'.
-                            language = language.substr(0, language.indexOf('-'));
-
-                        }
+                        return $mmConfig.get('languages').then(function(languages) {
+                            if (typeof languages[language] == 'undefined') {
+                                // Code is NOT supported. Fallback to language without dash. E.g. 'en-US' would fallback to 'en'.
+                                language = language.substr(0, language.indexOf('-'));
+                            }
+                            return language;
+                        }, function() {
+                            // Languages array not found (shouldn't happen).
+                            return language;
+                        });
+                    } else {
+                        return language;
                     }
-                    return language;
                 }, function() {
                     // Error getting locale. Use default language.
-                    return mmCoreConfigConstants.default_lang || fallbackLanguage;
+                    return getDefaultLanguage();
                 });
             } catch(err) {
                 // Error getting locale. Use default language.
-                return mmCoreConfigConstants.default_lang || fallbackLanguage;
+                return getDefaultLanguage();
             }
         }).then(function(language) {
             currentLanguage = language; // Save it for later.
