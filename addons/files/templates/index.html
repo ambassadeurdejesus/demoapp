@@ -1,26 +1,16 @@
-<ion-view view-title="{{'mma.files.myfiles' | translate}}">
-    <ion-content padding="true" mm-state-class>
+<ion-view view-title="Mes archives Meducloud">
+    <ion-content padding="true">
         <section ng-if="canAccessFiles()">
             <section class="list card" ng-if="showPrivateFiles()">
                 <a ui-sref="site.files-list({root: 'my'})" class="item item-icon-right" title="{{ 'mma.files.myprivatefiles' | translate }}">
                     <i class="icon ion-ios-arrow-right"></i>
-                    {{ 'mma.files.myprivatefiles' | translate }}
+                    Mes archives Meducloud
                 </a>
-                <div class="item item-text-wrap"><p>{{ 'mma.files.myprivatefilesdesc' | translate }}</p></div>
+                <div class="item item-text-wrap"><p>Bulletin scolaire, factures, reçus de paiement, ect...</p> <p>
+                    N'oubliez surtout pas d'archiver des documents qui ont rapport à Meducloud. Dans le cas contraire, votre compte pourrait être supprimé de notre système, merci de votre compréhension.
+                </p></div>
             </section>
 
-            <section class="list card">
-                <a ui-sref="site.files-list({root: 'site'})" class="item item-icon-right" title="{{ 'mma.files.sitefiles' | translate }}">
-                    <i class="icon ion-ios-arrow-right"></i>
-                    {{ 'mma.files.sitefiles' | translate }}
-                </a>
-                <div class="item item-text-wrap"><p>{{ 'mma.files.sitefilesdesc' | translate }}</p></div>
-            </section>
-
-            <div class="list card" ng-if="!canDownload()">
-                <div class="item item-text-wrap"><p>{{ 'mma.files.admindisableddownload' | translate }}</p></div>
-            </div>
-        </section>
 
         <section ng-if="showUpload()">
             <div class="card">
@@ -28,7 +18,7 @@
                 <p class="item-body">{{ 'mma.files.clicktoupload' | translate }}</p>
             </div>
             <a class="button button-block" ng-click="add()">
-                <i class="icon ion-plus"></i> {{ 'mm.fileuploader.uploadafile' | translate }}
+                <i class="icon ion-plus"></i> {{ 'mma.files.uploadafile' | translate }}
             </a>
         </section>
     </ion-content>
