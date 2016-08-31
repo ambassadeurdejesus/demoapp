@@ -1,21 +1,88 @@
-<ion-view view-title="{{ 'mm.login.connecttomoodle' | translate }}">
-  <ion-nav-buttons side="secondary">
-      <button class="button button-icon ion-help-circled" ng-click="showHelp()" aria-label="{{ 'mm.core.help' | translate }}"></button>
-  </ion-nav-buttons>
-  <ion-content id="mm-login-site" mm-state-class>
-      <div class="list">
-        <div class="item item-text-wrap">{{ 'mm.login.newsitedescription' | translate }}</div>
-        <form>
-          <label class="item item-input item-stacked-label">
-            <span class="input-label">{{ 'mm.login.siteaddress' | translate }}</span>
-            <input type="url" placeholder="moodle.org" ng-model="siteurl" mm-no-input-validation mm-auto-focus >
-          </label>
-          <div class="padding">
-              <button class="button button-block" ng-click="connect(siteurl)" ng-disabled="!siteurl">{{ 'mm.login.connect' | translate }}</button>
-              <!-- <input type="submit" class="button button-block" value="{{ 'mm.login.connect' | translate }}" > -->
-          </div>
+<ion-view view-title="BIENVENUE">
+<ion-content>
+<style type="text/css"> video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100;
+    transform: translateX(-50%) translateY(-50%);
+  transition: 1s opacity;
+}
+.stopfade {
+   opacity: .5;
+}
+
+#inner {
+    width: 50%;
+    /* Set the margin-left and margin-right automatically set */
+    margin: 0 auto;
+}
+</style>
+
+  <video autoplay  id="bgvid" loop>
+  <!-- WCAG general accessibility recommendation is that media such as background video play through only once. Loop turned on for the purposes of illustration; if removed, the end of the video will fade in the same way created by pressing the "Pause" button  -->
+<source src="img/lovensco.mp4" type="video/webm">
+<source src="img/lovensco.mp4" type="video/mp4">
+</video>
+ 
+      <div  class="list">
+        
+
+
+        <form id="inner">
+       <div align="center" style="background:#3c8dbc; color: #FFF;"   does-continue="true" slide-interval="1000" on-slide-changed="slideChanged(index)" style="visibility: visible; color: #FFF;">            <div class="slider-slides" ng-transclude="" >
+          <ion-slide class="slider-slide" data-index="0" style="width: 100%; ">
+            <div id="logo">
+              <img src="img/logo.png">
+            </div>
+            
+            <p>
+               
+            </p>
+
+            <p>
+              Meducloud App
+            </p>
+          </ion-slide>
+        
+        </div>          <div class="slider-pager"><!-- ngRepeat: slide in numSlides() track by $index --><span class="slider-pager-page active" ng-repeat="slide in numSlides() track by $index" ng-class="{active: $index == currentSlide}"><i class="icon ion-record"></i></span><!-- end ngRepeat: slide in numSlides() track by $index --><span class="slider-pager-page" ng-repeat="slide in numSlides() track by $index" ng-class="{active: $index == currentSlide}"><i class="icon ion-record"></i></span><!-- end ngRepeat: slide in numSlides() track by $index --><span class="slider-pager-page" ng-repeat="slide in numSlides() track by $index" ng-class="{active: $index == currentSlide}"><i class="icon ion-record"></i></span><!-- end ngRepeat: slide in numSlides() track by $index --></div></div>
+<div align="center">
+            <input type="hidden"  placeholder="moodle.org" ng-model="siteurl" ng-init="siteurl='meducloud.com/education/'" value="moodle.org"  mm-no-input-validation ng-change="validate(siteurl)" >
+         
+          
+              <button   class="button button-block"  ng-click="connect(siteurl)" >Connecter...</button>
+          
+<p></p>
+ 
+          </div> 
         </form>
       </div>
     </form>
+</div>
+
+
+<div align="center" class="tabs tabs-icon-top">
+
+
+  <a ng-click="showHelp()" class="tab-item">
+    <i class="icon ion-social-youtube-outline"></i>
+    Présentation
+  </a>
+
+
+<a  href="https://meducloud.com/activation/" class="tab-item">
+    <i class="icon ion-key"></i>
+    Activation
+  </a>
+</div>
   </ion-content>
 </ion-view>
+
+
+
+
+

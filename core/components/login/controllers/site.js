@@ -25,6 +25,23 @@ angular.module('mm.core.login')
         $ionicModal, $mmLoginHelper) {
 
     $scope.siteurl = '';
+    $scope.isInvalidUrl = true;
+
+    $scope.validate = function(url) {
+        if (!url) {
+            $scope.isInvalidUrl = true;
+            return;
+        }
+
+        $mmSitesManager.getDemoSiteData(url).then(function() {
+            // Is demo site.
+            $scope.isInvalidUrl = false;
+        }, function() {
+            // formatURL adds the protocol if is missing.
+            var formattedurl = $mmUtil.formatURL(url);
+            $scope.isInvalidUrl = formattedurl.indexOf('://localhost') == -1 && !$mmUtil.isValidURL(formattedurl);
+        });
+    };
 
     $scope.connect = function(url) {
 
@@ -35,15 +52,14 @@ angular.module('mm.core.login')
             return;
         }
 
-        var modal = $mmUtil.showModalLoading(),
-            sitedata = $mmSitesManager.getDemoSiteData(url);
+        var modal = $mmUtil.showModalLoading();
 
-        if (sitedata) {
-            // It's a demo site.
+        $mmSitesManager.getDemoSiteData(url).then(function(sitedata) {
+
             $mmSitesManager.getUserToken(sitedata.url, sitedata.username, sitedata.password).then(function(data) {
                 $mmSitesManager.newSite(data.siteurl, data.token).then(function() {
                     $ionicHistory.nextViewOptions({disableBack: true});
-                    return $mmLoginHelper.goToSiteInitialPage();
+                    $state.go('site.mm_courses');
                 }, function(error) {
                     $mmUtil.showErrorModal(error);
                 }).finally(function() {
@@ -54,7 +70,7 @@ angular.module('mm.core.login')
                 $mmUtil.showErrorModal(error);
             });
 
-        } else {
+        }, function() {
             // Not a demo site.
             $mmSitesManager.checkSite(url).then(function(result) {
 
@@ -65,7 +81,7 @@ angular.module('mm.core.login')
                 if ($mmLoginHelper.isSSOLoginNeeded(result.code)) {
                     // SSO. User needs to authenticate in a browser.
                     $mmUtil.showConfirm($translate('mm.login.logininsiterequired')).then(function() {
-                        $mmLoginHelper.openBrowserForSSOLogin(result.siteurl, result.code);
+                        $mmLoginHelper.openBrowserForSSOLogin(result.siteurl);
                     });
                 } else {
                     $state.go('mm_login.credentials', {siteurl: result.siteurl});
@@ -76,7 +92,7 @@ angular.module('mm.core.login')
             }).finally(function() {
                 modal.dismiss();
             });
-        }
+        });
     };
 
     // Get docs URL for help modal.

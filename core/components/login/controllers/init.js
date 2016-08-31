@@ -21,7 +21,7 @@ angular.module('mm.core.login')
  * @ngdoc controller
  * @name mmLoginInitCtrl
  */
-.controller('mmLoginInitCtrl', function($log, $ionicHistory, $state, $mmSitesManager, $mmSite, $mmApp, $mmLoginHelper) {
+.controller('mmLoginInitCtrl', function($log, $ionicHistory, $state, $mmSitesManager, $mmSite, $mmApp) {
 
     $log = $log.getInstance('mmLoginInitCtrl');
 
@@ -34,12 +34,12 @@ angular.module('mm.core.login')
         });
 
         if ($mmSite.isLoggedIn()) {
-            $mmLoginHelper.goToSiteInitialPage();
+            $state.go('site.mm_courses');
         } else {
             $mmSitesManager.hasSites().then(function() {
                 return $state.go('mm_login.sites');
             }, function() {
-                return $mmLoginHelper.goToAddSite();
+                return $state.go('mm_login.site');
             });
         }
     });

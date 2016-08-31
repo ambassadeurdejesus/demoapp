@@ -40,10 +40,10 @@ angular.module('mm.core.login', [])
         url: '/sites',
         templateUrl: 'core/components/login/templates/sites.html',
         controller: 'mmLoginSitesCtrl',
-        onEnter: function($mmLoginHelper, $mmSitesManager) {
+        onEnter: function($state, $mmSitesManager) {
             // Skip this page if there are no sites yet.
             $mmSitesManager.hasNoSites().then(function() {
-                $mmLoginHelper.goToAddSite();
+                $state.go('mm_login.site');
             });
         }
     })
@@ -59,9 +59,7 @@ angular.module('mm.core.login', [])
         templateUrl: 'core/components/login/templates/credentials.html',
         controller: 'mmLoginCredentialsCtrl',
         params: {
-            siteurl: '',
-            username: '',
-            urltoopen: '' // For content links.
+            siteurl: ''
         },
         onEnter: function($state, $stateParams) {
             // Do not allow access to this page when the URL was not passed.
@@ -93,40 +91,16 @@ angular.module('mm.core.login', [])
     $mmInitDelegateProvider.registerProcess('mmLogin', '$mmSitesManager.restoreSession', mmInitDelegateMaxAddonPriority + 200);
 })
 
-.run(function($log, $state, $mmUtil, $translate, $mmSitesManager, $rootScope, $mmSite, $mmURLDelegate, $ionicHistory, $timeout,
-                $mmEvents, $mmLoginHelper, mmCoreEventSessionExpired, $mmApp, $ionicPlatform, mmCoreConfigConstants) {
+.run(function($log, $state, $mmUtil, $translate, $mmSitesManager, $rootScope, $mmSite, $mmURLDelegate, $ionicHistory,
+                $mmEvents, $mmLoginHelper, mmCoreEventSessionExpired, $mmApp) {
 
     $log = $log.getInstance('mmLogin');
-
-    var isSSOConfirmShown,
-        waitingForBrowser = false;
 
     // Listen for sessionExpired event to reconnect the user.
     $mmEvents.on(mmCoreEventSessionExpired, sessionExpired);
 
     // Register observer to check if the app was launched via URL scheme.
     $mmURLDelegate.register('mmLoginSSO', appLaunchedByURL);
-
-    // Observe loaded pages in the InAppBrowser to handle SSO URLs.
-    $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event) {
-        // URLs with a custom scheme are prefixed with "http://", we need to remove this.
-        var url = event.url.replace(/^http:\/\//, '');
-        if (appLaunchedByURL(url)) {
-            // Close the browser if it's a valid SSO URL.
-            $mmUtil.closeInAppBrowser();
-        }
-    });
-
-    // Observe InAppBrowser closed and resume events to stop waiting for browser SSO.
-    $rootScope.$on('$cordovaInAppBrowser:exit', function() {
-        waitingForBrowser = false;
-    });
-    $ionicPlatform.on('resume', function() {
-        // Wait a second before setting it to false since in iOS there could be some frozen WS calls.
-        $timeout(function() {
-            waitingForBrowser = false;
-        }, 1000);
-    });
 
     // Redirect depending on user session.
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
@@ -139,7 +113,7 @@ angular.module('mm.core.login', [])
             return;
         }
 
-        if (toState.name.substr(0, 8) === 'redirect' || toState.name.substr(0, 15) === 'mm_contentlinks') {
+        if (toState.name.substr(0, 8) === 'redirect') {
             return;
         } else if ((toState.name.substr(0, 8) !== 'mm_login' || toState.name === 'mm_login.reconnect') && !$mmSite.isLoggedIn()) {
             // We are not logged in.
@@ -160,7 +134,7 @@ angular.module('mm.core.login', [])
                 disableAnimate: true,
                 disableBack: true
             });
-            $mmLoginHelper.goToSiteInitialPage();
+            $state.transitionTo('site.mm_courses');
         }
 
     });
@@ -184,23 +158,15 @@ angular.module('mm.core.login', [])
                 }
 
                 if ($mmLoginHelper.isSSOLoginNeeded(result.code)) {
-                    // SSO. User needs to authenticate in a browser. Prevent showing the message several times
-                    // or show it again if the user is already authenticating using SSO.
-                    if (!$mmApp.isSSOAuthenticationOngoing() && !isSSOConfirmShown && !waitingForBrowser) {
-                        isSSOConfirmShown = true;
-                        $mmUtil.showConfirm($translate('mm.login.reconnectssodescription')).then(function() {
-                            waitingForBrowser = true;
-                            $mmLoginHelper.openBrowserForSSOLogin(result.siteurl, result.code);
-                        }).finally(function() {
-                            isSSOConfirmShown = false;
-                        });
-                    }
+                    // SSO. User needs to authenticate in a browser.
+                    $mmUtil.showConfirm($translate('mm.login.reconnectssodescription')).then(function() {
+                        $mmLoginHelper.openBrowserForSSOLogin(siteurl);
+                    });
                 } else {
                     var info = $mmSite.getInfo();
                     if (typeof(info) !== 'undefined' && typeof(info.username) !== 'undefined') {
                         $ionicHistory.nextViewOptions({disableBack: true});
-                        $state.go('mm_login.reconnect',
-                                        {siteurl: result.siteurl, username: info.username, infositeurl: info.siteurl});
+                        $state.go('mm_login.reconnect', {siteurl: siteurl, username: info.username, infositeurl: info.siteurl});
                     }
                 }
             });
@@ -209,13 +175,12 @@ angular.module('mm.core.login', [])
 
     // Function to handle URL received by Custom URL Scheme. If it's a SSO login, perform authentication.
     function appLaunchedByURL(url) {
-        var ssoScheme = mmCoreConfigConstants.customurlscheme + '://token=';
+        var ssoScheme = 'moodlemobile://token=';
         if (url.indexOf(ssoScheme) == -1) {
             return false;
         }
 
         // App opened using custom URL scheme. Probably an SSO authentication.
-        $mmApp.startSSOAuthentication();
         $log.debug('App launched by URL');
 
         var modal = $mmUtil.showModalLoading('mm.login.authenticating', true);
@@ -231,20 +196,21 @@ angular.module('mm.core.login', [])
             return false;
         }
 
-        // Wait for app to be ready.
-        $mmApp.ready().then(function() {
-            return $mmLoginHelper.validateBrowserSSOLogin(url);
-        }).then(function(siteData) {
-            return $mmLoginHelper.handleSSOLoginAuthentication(siteData.siteurl, siteData.token);
-        }).then(function() {
-            $mmLoginHelper.goToSiteInitialPage();
-        }).catch(function(errorMessage) {
-            if (typeof errorMessage === 'string' && errorMessage !== '') {
+        $mmLoginHelper.validateBrowserSSOLogin(url).then(function(sitedata) {
+
+            $mmLoginHelper.handleSSOLoginAuthentication(sitedata.siteurl, sitedata.token).then(function() {
+                $state.go('site.mm_courses');
+            }, function(error) {
+                $mmUtil.showErrorModal(error);
+            }).finally(function() {
+                modal.dismiss();
+            });
+
+        }, function(errorMessage) {
+            modal.dismiss();
+            if (typeof(errorMessage) === 'string' && errorMessage != '') {
                 $mmUtil.showErrorModal(errorMessage);
             }
-        }).finally(function() {
-            modal.dismiss();
-            $mmApp.finishSSOAuthentication();
         });
 
         return true;
