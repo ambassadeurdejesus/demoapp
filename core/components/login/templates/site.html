@@ -1,35 +1,8 @@
 <ion-view view-title="BIENVENUE">
-<ion-content>
-<style type="text/css"> video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100;
-    transform: translateX(-50%) translateY(-50%);
-  transition: 1s opacity;
-}
-.stopfade {
-   opacity: .5;
-}
-
-#inner {
-    width: 50%;
-    /* Set the margin-left and margin-right automatically set */
-    margin: 0 auto;
-}
-</style>
-
-  <video autoplay  id="bgvid" loop>
-  <!-- WCAG general accessibility recommendation is that media such as background video play through only once. Loop turned on for the purposes of illustration; if removed, the end of the video will fade in the same way created by pressing the "Pause" button  -->
-<source src="img/lovensco.mp4" type="video/webm">
-<source src="img/lovensco.mp4" type="video/mp4">
-</video>
+<ion-content style="background:url('img/evee-640x640-68.jpg');background-size:100%;background-repeat:no-repeat">
+<p><p></p></p></p>
  
-      <div  class="list">
+      <div class="list" >
         
 
 
@@ -54,7 +27,7 @@
             <input type="hidden"  placeholder="moodle.org" ng-model="siteurl" ng-init="siteurl='meducloud.com/education/'" value="moodle.org"  mm-no-input-validation ng-change="validate(siteurl)" >
          
           
-              <button   class="button button-block"  ng-click="connect(siteurl)" >Connecter...</button>
+              <button   class="button button-block button-calm"  ng-click="connect(siteurl)" >Connecter...</button>
           
 <p></p>
  
@@ -62,14 +35,13 @@
         </form>
       </div>
     </form>
-</div>
 
 
 <div align="center" class="tabs tabs-icon-top">
 
 
   <a ng-click="showHelp()" class="tab-item">
-    <i class="icon ion-social-youtube-outline"></i>
+    <i class="icon ion-navicon"></i>
     Présentation
   </a>
 
