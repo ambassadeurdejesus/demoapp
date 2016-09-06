@@ -4,7 +4,6 @@
         
     </ion-nav-buttons>
     <ion-content>
-    <button class="button button-block ion-plus" ng-click="add()" ng-if="showUpload()" aria-label="{{ 'mma.files.uploadafile' | translate }}"> Ajouter </button>
         <ion-refresher pulling-text="{{ 'mm.core.pulltorefresh' | translate }}" ng-if="filesLoaded" on-refresh="refreshFiles()"></ion-refresher>
         <mm-loading hide-until="filesLoaded">
             <ul class="list">
