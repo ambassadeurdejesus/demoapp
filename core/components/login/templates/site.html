@@ -27,12 +27,13 @@
             <input type="hidden"  placeholder="moodle.org" ng-model="siteurl" ng-init="siteurl='meducloud.com/education/'" value="moodle.org"  mm-no-input-validation ng-change="validate(siteurl)" >
          
           
-              <button   class="button button-block button-calm"  ng-click="connect(siteurl)" >Connecter...</button>
-          
+             
 <p></p>
  
           </div> 
-        </form>
+         <button   class="button button-block button-calm"  ng-click="connect(siteurl)" >Portal Élève</button>
+              <a href="https://meducloud.com/login" class="button button-block button-light"  ng-click="connect(siteurl)" >Portal École</a>
+          
       </div>
     </form>
 
