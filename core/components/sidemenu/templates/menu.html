@@ -32,7 +32,7 @@
             <nav>
                 <ul class="list">
                 <li>
-                        <a ui-sref="site.mm_searchcourses"  class="item item-icon-left">   <i class="icon ion-ios-search"></i>Rechercher une école</a>
+                        <a ui-sref="site.mm_searchcourses"  class="item item-icon-left">   <i class="icon ion-ios-search"></i>Recherche</a>
                     </li>
                     <li>
                         <a menu-close class="item item-icon-left" ui-sref="site.mm_courses" title="{{ 'mm.sidemenu.mycourses' | translate}}">
@@ -47,11 +47,19 @@
                         </a>
                     </li>
 
+<li>  <a  menu-close class="item item-icon-left" llass="tab-item" class="item item-icon-left" ui-sref="site.mm_settings-general" title="{{ 'mm.sidemenu.appsettings' | translate}}">
+                          <i class="icon ion-mic-c"></i>
+                    Langue
+                    </a>   </li>
 
-                    
-<li>  <a  menu-close class="item item-icon-left" llass="tab-item" class="item item-icon-left" ui-sref="site.mm_settings" title="{{ 'mm.sidemenu.appsettings' | translate}}">
-                          <i class="icon ion-settings"></i>
-                    Mes préférences
+                    <li>  <a  menu-close class="item item-icon-left" llass="tab-item" class="item item-icon-left" ui-sref="site.mm_settings-spaceusage" title="{{ 'mm.sidemenu.appsettings' | translate}}">
+                          <i class="icon ion-ios-download"></i>
+                    Mémoire
+                    </a>   </li>
+
+                     <li>  <a  menu-close class="item item-icon-left" llass="tab-item" class="item item-icon-left" ui-sref="site.mm_settings-synchronization" title="{{ 'mm.sidemenu.appsettings' | translate}}">
+                          <i class="icon ion-android-download"></i>
+                    Sans Internet
                     </a>   </li>
 
 
@@ -62,17 +70,28 @@
                     </a>   </li>
 
 
-                    <li>  <a  href="https://meducloud.com/transfert/mobile/" title="Transfert Tracking"  menu-close class="item item-icon-left" class="item item-icon-left" title="Transfert Tracking">
+                    <li>  <a  href="https://meducloud.com/transfert/mobile" title="Transfert Tracking"  menu-close class="item item-icon-left" class="item item-icon-left" title="Transfert Tracking">
                                               <i class="icon ion-android-bicycle"></i>
                                        Transfert Tracking
                                         </a>   </li>
 
 
-                                        <li>  <a  href="https://meducloud.com/officiel/mobile/"  title="Résultats examens d'état"  menu-close class="item item-icon-left" class="item item-icon-left"  title="Résultats des examens d'Etat">
+                                        <li>  <a  href="https://meducloud.com/officiel/mobile"  title="Résultats examens d'état"  menu-close class="item item-icon-left" class="item item-icon-left"  title="Résultats des examens d'Etat">
                                                                   <i class="icon ion-university"></i>
                                                          Résultats des examens d'Etat
                                                             </a>   </li>
 
+
+<li>  <a  href="https://meducloud.com/medunews/mobile/"  title="Carnet Tracking"  menu-close class="item item-icon-left" class="item item-icon-left" title="Carnet Tracking">
+                          <i class="icon ion-speakerphone"></i>
+                 Medunews
+                    </a>   </li>
+
+
+<li>  <a  menu-close class="item item-icon-left" llass="tab-item" class="item item-icon-left" ui-sref="site.mm_settings-about" title="{{ 'mm.sidemenu.appsettings' | translate}}">
+                          <i class="icon ion-ipad"></i>
+                    À propos
+                    </a>   </li>
 
                 
   <li>  <a  menu-close class="item item-icon-left" llass="tab-item"  ng-click="logout()" title="{{ 'mm.sidemenu.logout' | translate}}">
