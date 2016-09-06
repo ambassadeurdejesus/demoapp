@@ -3,7 +3,7 @@
     "mm.core.android": "Android",
     "mm.core.areyousure": "Eske ou vle fè sa vre?",
     "mm.core.cancel": "Anile",
-    "mm.core.cannotconnect": "Cannot connect: Verify that you have typed correctly the URL and that your site uses Moodle 2.4 or later.",
+    "mm.core.cannotconnect": "Meducloud detecte que vous avez un problème internet",
     "mm.core.cannotdownloadfiles": "File downloading is disabled in your Mobile service. Please, contact your site administrator.",
     "mm.core.category": "Category",
     "mm.core.choose": "Chwazi",
